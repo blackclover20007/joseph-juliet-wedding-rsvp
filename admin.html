@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RSVP Admin | Joseph & Juliet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .admin-page { max-width: 980px; margin: 0 auto; padding: 38px 0; }
+      .admin-top { display:flex; justify-content:space-between; gap:20px; align-items:flex-end; margin-bottom:22px; }
+      .admin-top h1 { font-size: clamp(38px, 7vw, 60px); margin: 8px 0 0; }
+      .admin-actions { display:flex; gap:10px; flex-wrap:wrap; }
+      .admin-button { border:1px solid var(--gold); background:var(--paper); color:var(--ink); padding:12px 16px; font:600 11px Inter,sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+      .admin-button.primary { background:var(--ink); color:var(--paper); }
+      .admin-table-wrap { overflow-x:auto; background:var(--paper); border:1px solid var(--line); box-shadow:var(--shadow); }
+      table { width:100%; min-width:720px; border-collapse:collapse; text-align:left; }
+      th { background:#f7f0e4; color:var(--gold-deep); font:700 11px Inter,sans-serif; letter-spacing:.1em; text-transform:uppercase; }
+      th, td { padding:16px 18px; border-bottom:1px solid var(--line); vertical-align:top; }
+      td { font:16px/1.35 'Cormorant Garamond',Georgia,serif; }
+      td small { color:var(--muted); font:12px Inter,sans-serif; }
+      .pill { display:inline-block; padding:5px 9px; background:#f6eedf; color:var(--gold-deep); font:700 10px Inter,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+      .empty { padding:48px 20px; text-align:center; color:var(--muted); font:18px 'Cormorant Garamond',Georgia,serif; }
+      .admin-note { margin:14px 0 24px; color:var(--muted); font:13px/1.55 Inter,sans-serif; }
+      .admin-link { display:inline-block; margin-left:12px; color:var(--gold-deep); text-decoration:none; letter-spacing:0; text-transform:none; font-size:11px; }
+      @media (max-width:600px) { .admin-top { align-items:flex-start; flex-direction:column; } .admin-page { padding:24px 10px; } }
+    </style>
+  </head>
+  <body>
+    <main class="admin-page">
+      <div class="admin-top">
+        <div><p class="eyebrow">Owner dashboard</p><h1>RSVP responses</h1></div>
+        <div class="admin-actions"><button class="admin-button" id="export">Export CSV</button><button class="admin-button primary" id="refresh">Refresh</button></div>
+      </div>
+      <p class="admin-note">This simple version stores responses in the browser where the RSVP was submitted. Use the same browser on the owner device to view its records. For shared multi-device records, connect a database later.</p>
+      <section class="admin-table-wrap" aria-live="polite"><div id="empty" class="empty">No RSVP responses recorded yet.</div><table id="table" hidden><thead><tr><th>Names</th><th>Attendance</th><th>Guests</th><th>Submitted</th></tr></thead><tbody id="rows"></tbody></table></section>
+      <p style="margin-top:20px"><a href="index.html" class="admin-link">← Back to RSVP</a></p>
+    </main>
+    <script>
+      const key = 'joseph-juliet-rsvps';
+      const rows = document.querySelector('#rows');
+      const table = document.querySelector('#table');
+      const empty = document.querySelector('#empty');
+      const load = () => {
+        const records = JSON.parse(localStorage.getItem(key) || '[]').reverse();
+        rows.innerHTML = records.map((r) => `<tr><td><strong>${escapeHtml(r.names || '—')}</strong></td><td><span class="pill">${escapeHtml(r.attendance || '—')}</span></td><td>${escapeHtml(r.guests || '—')}</td><td><small>${r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—'}</small></td></tr>`).join('');
+        empty.hidden = records.length > 0; table.hidden = records.length === 0;
+      };
+      const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+      document.querySelector('#refresh').addEventListener('click', load);
+      document.querySelector('#export').addEventListener('click', () => {
+        const records = JSON.parse(localStorage.getItem(key) || '[]');
+        const csv = [['Names','Attendance','Guests','Submitted'], ...records.map((r) => [r.names || '', r.attendance || '', r.guests || '', r.submittedAt || ''])].map((row) => row.map((v) => `"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type:'text/csv' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'joseph-juliet-rsvp-responses.csv'; link.click(); URL.revokeObjectURL(link.href);
+      });
+      load();
+    </script>
+  </body>
+</html>

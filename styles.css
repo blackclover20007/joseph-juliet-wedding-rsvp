@@ -73,4 +73,6 @@ textarea { resize: vertical; min-height: 100px; }
 .success-message { margin-top: 18px; padding: 13px 15px; background: #eef5ed; color: #375a39; text-align: center; font-size: 14px; }
 footer { padding: 24px 0 0; text-align: center; color: var(--muted); font: 12px Inter, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
 footer span { padding: 0 8px; color: var(--gold); }
+footer .admin-link { margin-left: 12px; color: var(--gold-deep); font-size: 10px; letter-spacing: .04em; text-decoration: none; text-transform: none; }
+footer .admin-link:hover { text-decoration: underline; }
 @media (max-width: 600px) { .page-shell { width: min(100% - 18px, 780px); margin-top: 18px; } .invitation-card { padding: 34px 18px 38px; } .details-grid { grid-template-columns: 1fr; } .detail, .detail:nth-child(odd) { border-right: 0; border-bottom: 1px solid var(--line); } .detail:last-child { border-bottom: 0; } .rsvp-card { padding: 28px 20px 34px; } h1 { font-size: 47px; } }
